@@ -19,19 +19,20 @@ class AccountMove(models.Model):
         "transfer journal entry",
     )
 
-    @api.constrains("amount_total")
-    def _check_expense_ids(self):
-        DecimalPrecision = self.env["decimal.precision"]
-        precision = DecimalPrecision.precision_get("Product Price")
-        for move in self.filtered("expense_ids"):
-            expense_amount = sum(move.expense_ids.mapped("total_amount_currency"))
-            if float_compare(expense_amount, move.amount_total, precision) != 0:
-                raise ValidationError(
-                    self.env._(
-                        "You can't change the total amount, as there's an expense "
-                        "linked to this invoice."
-                    )
-                )
+    # commented out due  to error on expenses linked to invoice with different total amount than the sum of expenses, which is a common case when the invoice is created from the expense sheet and the user modifies the total amount of the invoice.
+    # @api.constrains("amount_total")
+    # def _check_expense_ids(self):
+    #     DecimalPrecision = self.env["decimal.precision"]
+    #     precision = DecimalPrecision.precision_get("Product Price")
+    #     for move in self.filtered("expense_ids"):
+    #         expense_amount = sum(move.expense_ids.mapped("total_amount_currency"))
+    #         if float_compare(expense_amount, move.amount_total, precision) != 0:
+    #             raise ValidationError(
+    #                 self.env._(
+    #                     "You can't change the total amount, as there's an expense "
+    #                     "linked to this invoice."
+    #                 )
+    #             )
 
     def action_view_expense(self):
         self.ensure_one()
